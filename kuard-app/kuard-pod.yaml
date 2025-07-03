@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard-pod-private-reg-amd64
+spec:
+  containers:
+  - name: kuard-container
+    image: dhrsharm.azurecr.io/kuar-demo/kuard:blue-amd64
+    ports:
+    - containerPort: 3000
+      protocol: TCP
+      name: http
+  imagePullSecrets:
+  - name: dhrsharm-cr-secret

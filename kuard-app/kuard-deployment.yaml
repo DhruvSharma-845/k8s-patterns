@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuard-deployment-private-reg-amd64
+  labels:
+    app: kuard-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kuard-prod
+  template:
+    metadata:
+      labels:
+        app: kuard-prod
+      annotations:
+        kubernetes.io/change-cause: "Triggering rollout"
+    spec:
+      containers:
+      - name: kuard-container
+        image: dhrsharm.azurecr.io/kuar-demo/kuard:blue-amd64
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+          name: http
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        env:
+          # An example of an environment variable used inside the container
+          - name: USER_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: kuard-config
+                key: USER_NAME
+        volumeMounts:
+          # Mounting the ConfigMap as a set of files
+          - name: config-volume
+            mountPath: /config
+          - name: logs-volume
+            mountPath: /opt
+      - name: log-sidecar-container
+        image: alpine:latest
+        command: ['sh', '-c', 'tail -F /opt/logs.txt']
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        volumeMounts:
+            - name: logs-volume
+              mountPath: /opt
+      # - name: twemproxy
+      #   image: ctxswitch/twemproxy
+      #   resources:
+      #     requests:
+      #       cpu: "500m"
+      #       memory: "512Mi"
+      #     limits:
+      #       cpu: "500m"
+      #       memory: "512Mi"
+      #   ports:
+      #     - containerPort: 22121 # Twemproxy default port
+      #   command:
+      #   - "nutcracker"
+      #   - "-c"
+      #   - "/etc/config/nutcracker.yaml"
+      #   - "-v"
+      #   - "7"
+      #   - "-s"
+      #   - "6222"
+      #   volumeMounts:
+      #   - name: twem-config-volume
+      #     mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: kuard-config
+        - name: logs-volume
+          emptyDir: {}
+        # - name: twem-config-volume
+        #   configMap:
+        #     name: twem-config
+      imagePullSecrets:
+      - name: dhrsharm-cr-secret
