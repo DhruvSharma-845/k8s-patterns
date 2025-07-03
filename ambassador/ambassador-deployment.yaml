@@ -31,5 +31,24 @@ spec:
           limits:
             cpu: "500m"
             memory: "512Mi"
+      - name: twemproxy
+        image: ctxswitch/twemproxy
+        ports:
+          - containerPort: 22121 # Twemproxy default port
+        command:
+          - "nutcracker"
+          - "-c"
+          - "/etc/config/nutcracker.yaml"
+          - "-v"
+          - "7"
+          - "-s"
+          - "6222"
+        volumeMounts:
+          - name: twem-config-volume
+            mountPath: /etc/config
       imagePullSecrets:
       - name: dhrsharm-cr-secret
+      volumes:
+        - name: twem-config-volume
+          configMap:
+            name: twem-config
