@@ -12,6 +12,13 @@
 
 ## 2. Ambassador Pattern
 
+### Prepare docker image for ambassador app
+1. Build the docker image: `docker build -t <PRIVATE_REGISTRY_NAME>.azurecr.io/ambassador-demo/springredisproxy:amd64 --platform linux/amd64 .`
+2. Push the docker image to private registry: `docker push <PRIVATE_REGISTRY_NAME>.azurecr.io/ambassador-demo/springredisproxy:amd64`
+
+### Deploy ambassador app on azure
+1. Deploy the app: `kubectl apply -f ambassador-deployment.yaml`
+
 
 ## Login to Azure
 1. Login using az cli: `az login`

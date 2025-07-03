@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ambassador-deployment
+  labels:
+    app: ambassador-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ambassador-prod
+  template:
+    metadata:
+      labels:
+        app: ambassador-prod
+      annotations:
+        kubernetes.io/change-cause: "Triggering rollout"
+    spec:
+      containers:
+      - name: ambassador-container
+        image: dhrsharm.azurecr.io/ambassador-demo/springredisproxy:amd64
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+          name: http
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      imagePullSecrets:
+      - name: dhrsharm-cr-secret
