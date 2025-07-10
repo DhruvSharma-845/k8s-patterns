@@ -1,0 +1,10 @@
+# Ignore non-Kubernetes files
+package.json
+package-lock.json
+node_modules/
+app.js
+Dockerfile
+.dockerignore
+kuard-config
+kuard-pod.yaml
+kuard-replicaset.yaml
